@@ -25,7 +25,7 @@ export class PreInterview {
 
     const interview = await prisma.interview.create({
       data: {
-        githubMetadata: data as Prisma.InputJsonValue,
+        githubMetadata: data,
         status: "Pre",
       },
     });
