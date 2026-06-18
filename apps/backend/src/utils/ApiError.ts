@@ -1,7 +1,7 @@
 class ApiError extends Error {
   statusCode: number;
   data: null;
-  message: string;
+  override message: string;
   success: boolean;
   errors: any[];
 

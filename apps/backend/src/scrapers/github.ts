@@ -2,7 +2,7 @@ import { Octokit } from "octokit";
 
 // Initialize Octokit (Keep your token secure in environment variables)
 const octokit = new Octokit({
-  auth: process.env.Scraping_Token,
+  auth: process.env.SCRAPING_TOKEN,
 });
 
 // Define an interface for the clean data you want to send back to the frontend

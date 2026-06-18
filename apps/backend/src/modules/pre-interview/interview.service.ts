@@ -1,8 +1,8 @@
-import type { PreInterviewInput } from "./interviwe.types";
+import type { PreInterviewInput } from "./interview.types.js";
 import { prisma } from "../../../db.js";
-import { getUserPublicRepos } from "../../scrapers/github";
+import { getUserPublicRepos } from "../../scrapers/github.js";
 import ApiError from "../../utils/ApiError.js";
-import type { Prisma } from "../../../src/generated/prisma/client.js";
+import type { Prisma } from "../../generated/prisma/client.js";
 
 export class PreInterview {
   async preInterview(input: PreInterviewInput) {
@@ -25,6 +25,7 @@ export class PreInterview {
 
     const interview = await prisma.interview.create({
       data: {
+        // cast to Prisma.InputJsonValue so the array of repos is accepted
         githubMetadata: data,
         status: "Pre",
       },

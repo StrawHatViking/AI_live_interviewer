@@ -1,7 +1,7 @@
 import { Toaster } from "sonner";
-import ProfileForm from "./ProfileForm";
+import ProfileForm from "./Pages/ProfileForm";
 import { BrowserRouter, Route, Routes } from "react-router";
-import Interview from "./Interview";
+import InterviewRoom from "./Pages/InterviewRoom";
 
 export function App() {
   return (
@@ -9,7 +9,7 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<ProfileForm />} />
-          <Route path="/interview/:id" element={<Interview />} />
+          <Route path="/interview/:id" element={<InterviewRoom />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" duration={2000} />

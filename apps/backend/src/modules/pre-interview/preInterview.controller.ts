@@ -5,7 +5,7 @@ import ApiError from "../../utils/ApiError.js";
 import {
   preInterviewSchema,
   type PreInterviewInput,
-} from "./interviwe.types.js";
+} from "./interview.types.js";
 import { PreInterview } from "./interview.service.js";
 
 const InterviewService = new PreInterview();

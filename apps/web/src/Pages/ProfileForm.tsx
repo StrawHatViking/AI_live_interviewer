@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import "../styles/globals.css";
+import "../../styles/globals.css";
 import axios from "axios";
 import { useNavigate } from "react-router";
 
