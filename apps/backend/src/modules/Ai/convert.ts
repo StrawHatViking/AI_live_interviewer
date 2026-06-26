@@ -21,9 +21,10 @@ export async function fetchDataInMd(interviewId: string) {
         githubMetadata: true,
       },
     });
-    if (!rawData) throw new Error("No data found");
-    console.log(typeof rawData.githubMetadata); // object
-    console.log(Array.isArray(rawData.githubMetadata)); // true
+    if (!rawData || !rawData.githubMetadata) {
+      console.log("No GitHub metadata found for interviewId:", interviewId);
+      return null;
+    }
     if (!Array.isArray(rawData.githubMetadata)) {
       throw new Error("GitHub metadata is missing or is not an array");
     }

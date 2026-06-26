@@ -2,14 +2,18 @@ import { Toaster } from "sonner";
 import ProfileForm from "./Pages/ProfileForm";
 import { BrowserRouter, Route, Routes } from "react-router";
 import InterviewRoom from "./Pages/InterviewRoom";
+import Result from "./Pages/Result";
+import LandingPage from "./Pages/LandingPage";
 
 export function App() {
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<ProfileForm />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/setup" element={<ProfileForm />} />
           <Route path="/interview/:id" element={<InterviewRoom />} />
+          <Route path="/results/:interviewId" element={<Result />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" duration={2000} />

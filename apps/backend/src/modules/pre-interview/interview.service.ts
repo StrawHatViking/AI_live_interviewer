@@ -3,9 +3,10 @@ import { prisma } from "../../../db.js";
 import { getUserPublicRepos } from "../../scrapers/github.js";
 import ApiError from "../../utils/ApiError.js";
 import type { Prisma } from "../../generated/prisma/client.js";
+import { PDFParse } from "pdf-parse";
 
 export class PreInterview {
-  async preInterview(input: PreInterviewInput) {
+  async preInterview(input: PreInterviewInput, fileBuffer: any) {
     // TODO: URL can be malformed , implement a SLM here
     const githubUrl = input.github.endsWith("/")
       ? input.github.slice(0, -1)
@@ -13,6 +14,9 @@ export class PreInterview {
     const linkedinUrl = input.linkedin?.endsWith("/")
       ? input.linkedin?.slice(0, -1)
       : input.linkedin;
+
+    const extractedText = new PDFParse({ data: fileBuffer });
+    const text = await extractedText.getText();
 
     const githubUsername = githubUrl.split("/").pop();
     const linkedinUsername = linkedinUrl?.split("/").pop();
@@ -28,6 +32,10 @@ export class PreInterview {
         // cast to Prisma.InputJsonValue so the array of repos is accepted
         githubMetadata: data,
         status: "Pre",
+        resumeText: text.text,
+        jobRole: input.jobRole,
+        difficulty: input.difficulty,
+        durationMins: parseInt(input.duration, 10) || 10,
       },
     });
 

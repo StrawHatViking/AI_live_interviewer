@@ -1,41 +1,53 @@
-import { serve } from "bun";
-import index from "./index.html";
+const port = parseInt(process.env.PORT || "3000");
 
-const server = serve({
-  routes: {
-    // Serve index.html for all unmatched routes.
-    "/*": index,
+Bun.serve({
+  port,
+  async fetch(req) {
+    const pathname = new URL(req.url).pathname;
 
-    "/api/hello": {
-      async GET(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "GET",
+    if (pathname === "/") {
+      return new Response(Bun.file("./index.html"));
+    }
+
+    // Transpile .tsx/.ts with Bun.build (resolves bare imports)
+    if (/\.tsx?$/.test(pathname)) {
+      try {
+        const result = await Bun.build({
+          entrypoints: [`.${pathname}`],
+          target: "browser",
+          format: "esm",
         });
-      },
-      async PUT(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "PUT",
+        if (result.success && result.outputs.length > 0) {
+          return new Response(result.outputs[0]);
+        }
+        return new Response(result.logs.join("\n"), { status: 500 });
+      } catch (e: any) {
+        return new Response(e?.message || String(e), { status: 500 });
+      }
+    }
+
+    // Process CSS with Tailwind
+    if (pathname.endsWith(".css")) {
+      const { default: tailwind } = await import("bun-plugin-tailwind");
+      try {
+        const result = await Bun.build({
+          entrypoints: [`.${pathname}`],
+          target: "browser",
+          plugins: [tailwind],
         });
-      },
-    },
+        if (result.success && result.outputs.length > 0) {
+          return new Response(result.outputs[0]);
+        }
+      } catch {}
+      const f = Bun.file(`.${pathname}`);
+      if (await f.exists()) return new Response(f);
+    }
 
-    "/api/hello/:name": async (req) => {
-      const name = req.params.name;
-      return Response.json({
-        message: `Hello, ${name}!`,
-      });
-    },
-  },
+    // Static files
+    const file = Bun.file(`.${pathname}`);
+    if (await file.exists()) return new Response(file);
 
-  development: process.env.NODE_ENV !== "production" && {
-    // Enable browser hot reloading in development
-    hmr: true,
-
-    // Echo console logs from the browser to the server
-    console: true,
+    // SPA fallback
+    return new Response(Bun.file("./index.html"));
   },
 });
-
-console.log(`🚀 Server running at ${server.url}`);

@@ -1,159 +1,71 @@
-# Turborepo starter
+# Crazyy AI Live Interviewer
 
-This Turborepo starter is maintained by the Turborepo core team.
+A real-time, voice-to-voice AI mock interviewer powered by the **Gemini Live API**. Crazyy reads your resume, conducts a dynamic technical interview, and provides actionable feedback and a final score based on your performance.
 
-## Using this example
+## 🚀 Features
 
-Run the following command:
+- **Real-Time Voice Conversation:** Low-latency voice streaming using Web Audio API and the Gemini Live SDK.
+- **Resume Context:** Upload your PDF resume, and the AI will dynamically tailor its questions to your actual experience and tech stack.
+- **Cross-Browser Audio Pipeline:** Custom-built audio processing with intelligent mic-gating to prevent echo feedback loops (fully compatible with Chrome, Firefox, and Safari).
+- **Beautiful UI:** Modern, responsive interface with fluid animations (Framer Motion), real-time audio visualization, and premium typography.
+- **Performance Evaluation:** Get a final score out of 100, detailed AI feedback, and a full transcript of your interview session.
 
-```sh
-npx create-turbo@latest
-```
+## 🛠️ Tech Stack
 
-## What's inside?
+- **Monorepo:** Turborepo + Bun
+- **Frontend:** React, TailwindCSS, Framer Motion, Lucide Icons
+- **Backend:** Node.js, Express, Prisma ORM (PostgreSQL)
+- **AI:** Google Gen AI SDK (`gemini-3.1-flash-live-preview`)
 
-This Turborepo includes the following packages/apps:
+## 📦 Local Development
 
-### Apps and Packages
+### Prerequisites
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- [Bun](https://bun.sh/) installed on your machine
+- A PostgreSQL database (local or cloud like Supabase/Neon)
+- A Gemini API Key from Google AI Studio
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Setup
 
-### Utilities
+1. **Clone the repository:**
 
-This Turborepo has some additional tools already setup for you:
+   ```bash
+   git clone <your-repo-url>
+   cd AI_Live_Interviewer
+   ```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+2. **Install dependencies:**
 
-### Build
+   ```bash
+   bun install
+   ```
 
-To build all apps and packages, run the following command:
+3. **Configure Environment Variables:**
+   - Copy the example env file in the root: `cp .env.example .env`
+   - Fill in your `DATABASE_URL` and `GEMINI_API_KEY` in the `.env` file (and potentially in `apps/backend/.env` if required by your setup).
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+4. **Initialize the Database:**
 
-```sh
-cd my-turborepo
-turbo build
-```
+   ```bash
+   cd apps/backend
+   npx prisma db push
+   # or npx prisma migrate dev
+   ```
 
-Without global `turbo`, use your package manager:
+5. **Start the Development Servers:**
+   From the root of the project, run:
+   ```bash
+   bun run dev
+   ```
+   - The frontend will be available at `http://localhost:5173`
+   - The backend will run on `http://localhost:3000`
 
-```sh
-cd my-turborepo
-npx turbo build
-bun dlx turbo build
-bun exec turbo build
-```
+## 🧠 Architecture Notes
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+- **Client-Side Audio:** The frontend establishes a direct WebSocket connection to the Gemini Live API for real-time audio streaming. This reduces latency by cutting out the middleman server.
+- **Backend Role:** The Node.js backend handles secure token generation, PDF parsing, interview initialization, and securely storing the final scores and transcripts in the PostgreSQL database.
+- **Firefox Compatibility:** The Web Audio API implementation utilizes manual 16kHz resampling and state-based mic muting during AI speech to prevent severe acoustic echo cancellation (AEC) failures natively found in Firefox.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## 📄 License
 
-```sh
-turbo build --filter=docs
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-bun exec turbo build --filter=docs
-bun exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-bun exec turbo dev
-bun exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-bun exec turbo dev --filter=web
-bun exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-bun exec turbo login
-bun exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-bun exec turbo link
-bun exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+MIT

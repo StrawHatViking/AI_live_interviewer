@@ -14,6 +14,13 @@ const submitPreInterview = asyncHandler(async (req: Request, res: Response) => {
   const parsed = preInterviewSchema.safeParse(req.body);
   const { data } = parsed;
 
+  if (!req.file) {
+    res.status(400).json({ error: "Please select a PDF file to upload." });
+    return;
+  }
+
+  const fileBuffer = req.file.buffer;
+
   if (!parsed.success) {
     const errors = parsed.error.issues.map((e) => ({
       field: e.path.join("."),
@@ -23,7 +30,7 @@ const submitPreInterview = asyncHandler(async (req: Request, res: Response) => {
   }
   const input = data as PreInterviewInput;
 
-  const profiles = await InterviewService.preInterview(input);
+  const profiles = await InterviewService.preInterview(input, fileBuffer);
 
   return res
     .status(200)

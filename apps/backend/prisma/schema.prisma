@@ -15,7 +15,13 @@ datasource db {
 model Interview {
   id             String          @id @default(uuid())
   score          Int             @default(0)
+  feedback       String?
+  resumeText     String?
   status         InterviewStatus
+  difficulty     Difficulty      @default(Medium)
+  durationMins   Int             @default(10)
+  jobRole        String?
+  isMock         Boolean         @default(true)
   githubMetadata Json
   conversations  Message[]
 }
@@ -25,6 +31,7 @@ model Message {
   message     String
   type        MessageType
   interviewId String
+  createdAt   DateTime    @default(now())
   interview   Interview   @relation(fields: [interviewId], references: [id])
 }
 
@@ -37,4 +44,10 @@ enum InterviewStatus {
   Pre
   Ongoing
   Done
+}
+
+enum Difficulty {
+  Easy
+  Medium
+  Hard
 }
