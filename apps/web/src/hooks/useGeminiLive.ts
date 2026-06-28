@@ -1,5 +1,5 @@
 import { API_URL } from "@/lib/config";
-import { EndSensitivity, GoogleGenAI } from "@google/genai";
+import { StartSensitivity, EndSensitivity, GoogleGenAI } from "@google/genai";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -55,7 +55,8 @@ export function useGeminiLive(
             realtimeInputConfig: {
               automaticActivityDetection: {
                 disabled: false,
-                startOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_LOW,
+                startOfSpeechSensitivity:
+                  StartSensitivity.START_SENSITIVITY_LOW,
                 endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_LOW,
                 prefixPaddingMs: 500,
                 silenceDurationMs: 1000,
@@ -118,9 +119,9 @@ export function useGeminiLive(
                 const history = conversationHistory.current;
                 if (
                   history.length > 0 &&
-                  history[history.length - 1].type === "User"
+                  history[history.length - 1]?.type === "User"
                 ) {
-                  history[history.length - 1].message +=
+                  history[history.length - 1]!.message +=
                     content.inputTranscription.text;
                 } else {
                   history.push({
@@ -132,14 +133,13 @@ export function useGeminiLive(
 
               if (content?.outputTranscription?.text) {
                 transcriptRef.current += content.outputTranscription.text;
-                console.log("Output:", transcriptRef.current);
 
                 const history = conversationHistory.current;
                 if (
                   history.length > 0 &&
-                  history[history.length - 1].type === "Assistant"
+                  history[history.length - 1]?.type === "Assistant"
                 ) {
-                  history[history.length - 1].message +=
+                  history[history.length - 1]!.message +=
                     content.outputTranscription.text;
                 } else {
                   history.push({
@@ -352,13 +352,16 @@ export function useGeminiLive(
       }
       const base64Chunk = btoa(binaryString);
 
-      // 5. Official SDK layout for sending chunks safely
-      sessionRef.current.sendRealtimeInput({
-        audio: {
-          data: base64Chunk,
-          mimeType: "audio/pcm;rate=16000",
-        },
-      });
+      try {
+        sessionRef.current.sendRealtimeInput({
+          audio: {
+            mimeType: "audio/pcm;rate=16000",
+            data: base64Chunk,
+          },
+        });
+      } catch (err) {
+        console.error("sendRealtimeInput failed:", err);
+      }
     };
   }
 
@@ -386,6 +389,7 @@ export function useGeminiLive(
       const aiAnalyser = playbackContextRef.current.createAnalyser();
       aiAnalyser.fftSize = 256;
       aiAnalyserRef.current = aiAnalyser;
+      aiAnalyser.connect(playbackContextRef.current.destination);
     }
     const ctx = playbackContextRef.current;
 
@@ -410,7 +414,6 @@ export function useGeminiLive(
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(aiAnalyserRef.current!);
-    aiAnalyserRef.current!.connect(ctx.destination);
 
     // 2. THE QUEUE SYSTEM: Schedule the chunks to play one after another
     // If the audio context timer is further ahead than our next play time, reset it
@@ -434,6 +437,7 @@ export function useGeminiLive(
       const aiAnalyser = playbackContextRef.current.createAnalyser();
       aiAnalyser.fftSize = 256;
       aiAnalyserRef.current = aiAnalyser;
+      aiAnalyser.connect(playbackContextRef.current.destination);
     }
 
     // Explicitly resume the context inside the click handler for Firefox

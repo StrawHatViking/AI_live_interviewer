@@ -29,7 +29,7 @@ function CustomSelect({ value, onChange, options, label }: { value: string, onCh
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full px-4 py-2.5 rounded-md bg-white border text-stone-800 transition-all duration-300 cursor-pointer font-medium flex items-center justify-between select-none ${isOpen ? 'border-stone-400 ring-4 ring-stone-100' : 'border-stone-200 hover:border-stone-300'}`}
       >
-        <span className="text-sm">{selectedOption.label}</span>
+        <span className="text-sm">{selectedOption?.label}</span>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
           <ChevronDown className="w-4 h-4 text-stone-400" />
         </motion.div>

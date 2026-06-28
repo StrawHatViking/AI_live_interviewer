@@ -16,6 +16,9 @@ Bun.serve({
           entrypoints: [`.${pathname}`],
           target: "browser",
           format: "esm",
+          define: {
+            "process.env.BACKEND_URL": JSON.stringify(Bun.env.BACKEND_URL || ""),
+          },
         });
         if (result.success && result.outputs.length > 0) {
           return new Response(result.outputs[0]);
